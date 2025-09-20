@@ -2,7 +2,10 @@ module github.com/evolvedevlab/tinygram
 
 go 1.23.5
 
-require github.com/dgraph-io/badger/v4 v4.8.0
+require (
+	github.com/dgraph-io/badger/v4 v4.8.0
+	golang.org/x/text v0.26.0
+)
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
