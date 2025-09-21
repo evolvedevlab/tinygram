@@ -12,7 +12,7 @@ var (
 )
 
 type Index struct {
-	db *badger.DB
+	store *Store
 }
 
 func NewIndex(path string) (*Index, error) {
@@ -22,7 +22,27 @@ func NewIndex(path string) (*Index, error) {
 		return nil, err
 	}
 
-	return &Index{db: db}, nil
+	return &Index{
+		store: &Store{db: db},
+	}, nil
+}
+
+func NewIndexWithOptions(opts badger.Options) (*Index, error) {
+	db, err := badger.Open(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Index{
+		store: &Store{db: db},
+	}, nil
+}
+
+func (idx *Index) NewBatch() *Batch {
+	return &Batch{
+		store: idx.store,
+		data:  make(map[string][]string),
+	}
 }
 
 func (idx *Index) IndexDocument(doc *Document) error {
@@ -37,17 +57,13 @@ func (idx *Index) IndexDocument(doc *Document) error {
 			// generating trigrams from the given string
 			trigrams := generateTrigrams(s)
 
-			docLen := uint16(len(trigrams))
-			freqs := make(map[string]uint8)
-			for _, trigram := range trigrams {
-				freqs[trigram]++
-			}
-
-			_ = docLen
-
-			// todo
+			return idx.store.Insert(doc.ID, trigrams)
 		}
 	}
 
 	return ErrInvalidFieldType
+}
+
+func (idx *Index) Close() error {
+	return idx.store.Close()
 }

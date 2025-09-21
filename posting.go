@@ -8,7 +8,6 @@ import (
 )
 
 // Posting represents a single document’s entry in a trigram’s posting list.
-// Each posting stores:
 //   - DocID:     the unique identifier of the document
 //   - DocLength: the total number of trigrams extracted from the document field
 //   - Frequency: how many times this trigram appears in that document
